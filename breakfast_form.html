@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Breakfast Order | Plan tomorrow's morning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg: #050711;
+            --card: #111827;
+            --card-soft: #020617;
+            --border: #1f2937;
+            --border-soft: #111827;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --gold: #facc6b;
+            --gold-soft: #fbbf24;
+            --error: #f97373;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 40%, #000 100%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px;
+        }
+
+        .page { width: 100%; max-width: 960px; }
+
+        .card {
+            background: radial-gradient(circle at top left, #111827 0, #020617 40%, #020617 100%);
+            border-radius: 24px;
+            padding: 28px 26px 26px;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.8);
+        }
+
+
+        .page-eyebrow {
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.18em;
+            color: var(--muted);
+        }
+
+        .page-heading {
+            font-size: 2rem;
+            margin: 6px 0 4px;
+            color: var(--gold);
+        }
+
+        .page-subtitle {
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        .info-text {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 6px;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.8rem;
+        }
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+        }
+        .nav-links a.active {
+            border-color: var(--gold);
+            color: var(--gold);
+            background: rgba(250, 204, 107, 0.1);
+        }
+
+        .section {
+            margin-top: 20px;
+            padding: 18px 18px 16px;
+            border-radius: 18px;
+            background: linear-gradient(145deg, rgba(15,23,42,0.95), rgba(2,6,23,0.95));
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .section-title span { color: var(--gold); }
+
+        .section-subtitle {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .grid-3 {
+            display: grid;
+            gap: 12px;
+        }
+        @media (min-width: 768px) {
+            .grid-3 { grid-template-columns: 2fr 2fr 1fr; }
+        }
+
+        .grid-2 {
+            display: grid;
+            gap: 12px;
+        }
+        @media (min-width: 640px) {
+            .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .field { position: relative; }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            border-radius: 999px;
+            border: 1px solid var(--border-soft);
+            background: #020617;
+            padding: 9px 12px;
+            font-size: 0.9rem;
+            color: var(--text);
+        }
+
+        input[type="date"] { padding-right: 36px; }
+
+        textarea {
+            border-radius: 16px;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        input::placeholder, textarea::placeholder { color: #6b7280; }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 1px rgba(250, 204, 107, 0.45);
+        }
+
+        .time-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .time-input { display: none; }
+
+        .time-pill {
+            border-radius: 999px;
+            padding: 6px 16px;
+            font-size: 0.8rem;
+            border: 1px solid var(--border-soft);
+            color: var(--muted);
+            cursor: pointer;
+            background: #020617;
+        }
+
+        .time-input:checked + .time-pill {
+            border-color: var(--gold);
+            background: radial-gradient(circle at top, rgba(250, 204, 107, 0.18), #020617 50%);
+            color: var(--gold);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .option-row {
+            border-radius: 14px;
+            border: 1px solid var(--border-soft);
+            background: #020617;
+            overflow: hidden;
+        }
+
+        .option-input { display: none; }
+
+        .option-card {
+            display: flex;
+            flex-direction: column;
+            padding: 10px 12px 10px 14px;
+            cursor: pointer;
+        }
+
+        .option-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .option-number {
+            margin-right: 8px;
+            color: var(--gold-soft);
+        }
+
+        .option-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .option-input:checked + .option-card {
+            border-left: 3px solid var(--gold);
+            background: radial-gradient(circle at left, rgba(250,204,107,0.23), #020617 55%);
+            box-shadow: 0 0 0 1px rgba(250, 204, 107, 0.35);
+        }
+
+        .notes-example {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .footer-bar {
+            margin-top: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .btn-confirm {
+            border-radius: 999px;
+            border: none;
+            padding: 10px 26px;
+            background: radial-gradient(circle at top left, #facc6b, #fbbf24);
+            color: #111827;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 14px 30px rgba(250, 204, 107, 0.45);
+        }
+
+        .btn-confirm:hover {
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        .ok-banner {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(22, 163, 74, 0.12);
+            border: 1px solid rgba(22, 163, 74, 0.7);
+            color: #bbf7d0;
+            font-size: 0.8rem;
+            display: none;
+        }
+
+        .ok-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: #22c55e;
+            display: inline-block;
+            margin-right: 6px;
+        }
+/* Üst header düzeni: logo + başlıklar */
+.header-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+/* Logo kutusu */
+.brand-logo-wrap {
+    flex-shrink: 0;
+}
+
+.brand-logo {
+    width: 150px;          /* Daha büyük / küçük istersen burayı oynat */
+    max-width: 40vw;
+}
+
+.brand-logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Eski center hizalamayı kaldırıyoruz */
+.page-title {
+    text-align: left;
+    margin-bottom: 0;
+}
+
+        .required { color: #f97373; }
+    </style>
+</head>
+<body>
+
+<div class="page">
+    <div class="card">
+
+        <!-- ÜST LOGO + BAŞLIK SATIRI -->
+        <div class="header-row">
+            <div class="brand-logo-wrap">
+                <div class="brand-logo">
+                    <img src="{{ url_for('static', filename='img/logo1.jpg') }}"
+                         alt="Monte Pine Chalets">
+                </div>
+            </div>
+
+            <div class="page-title">
+                <div class="page-eyebrow">BREAKFAST</div>
+                <h1 class="page-heading">Plan tomorrow's morning</h1>
+                <p class="page-subtitle">
+                    Please place your order by 21:00 the evening before. Each guest may choose
+                    one à la carte breakfast (1–8) and one sweet option (9 or 10). This allows
+                    our team to prepare everything fresh and on time.
+                </p>
+                <p class="info-text">
+                    Breakfast is served at 08:00, 09:00 or 10:00.
+                </p>
+            </div>
+        </div>
+
+        <!-- NAV LINKLER BURADA KALSIN -->
+        <div class="nav-links">
+            <a href="/breakfast" class="active">Breakfast</a>
+            <a href="/lunch">Lunch</a>
+            <a href="/dinner">Dinner</a>
+        </div>
+
+
+        <div id="okBanner" class="ok-banner">
+            <span class="ok-dot"></span>
+            Your breakfast order has been saved. Thank you.
+        </div>
+
+        <form action="/submit/breakfast" method="POST" novalidate>
+            <!-- GUEST DETAILS -->
+            <div class="section">
+                <div class="section-title">Guest details</div>
+                <div class="grid-3">
+                    <div class="field">
+                        <label for="room_number">Room / Chalet <span class="required">*</span></label>
+                        <input type="text" id="room_number" name="room_number" placeholder="e.g. 204" required>
+                    </div>
+                    <div class="field">
+                        <label for="guest_name">Guest name</label>
+                        <input type="text" id="guest_name" name="guest_name" placeholder="Optional">
+                    </div>
+                    <div class="field">
+                        <label for="guests_count">Number of guests <span class="required">*</span></label>
+                        <input type="number" id="guests_count" name="guests_count" min="1" value="2" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATE & TIME -->
+            <div class="section">
+                <div class="section-title">Date & Serving time</div>
+                <div class="grid-2">
+                    <div class="field">
+                        <label for="service_date">Breakfast date <span class="required">*</span></label>
+                        <input type="date" id="service_date" name="service_date" required>
+                    </div>
+                    <div class="field">
+                        <label>Preferred time <span class="required">*</span></label>
+                        <div class="time-pills">
+                            {% for t in time_slots %}
+                                {% set id = 'time_' ~ loop.index %}
+                                <div>
+                                    <input class="time-input" type="radio"
+                                           id="{{ id }}" name="preferred_time"
+                                           value="{{ t }}" {% if loop.first %}checked{% endif %}>
+                                    <label for="{{ id }}" class="time-pill">{{ t }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- A LA CARTE -->
+            <div class="section">
+                <div class="section-title">
+                    À la carte breakfast <span>(choose one)</span>
+                </div>
+                <div class="section-subtitle">
+                    Please select one main breakfast option for each guest. If you have different choices per person,
+                    add it to the notes below.
+                </div>
+
+                <div class="options-list">
+                    {% for item in main_options %}
+                        {% set input_id = 'main_' ~ item.id %}
+                        <div class="option-row">
+                            <input class="option-input" type="radio"
+                                   id="{{ input_id }}"
+                                   name="main_option"
+                                   value="{{ item.id ~ '. ' ~ item.title }}"
+                                   {% if loop.first %}required{% endif %}>
+                            <label class="option-card" for="{{ input_id }}">
+                                <div class="option-title">
+                                    <span class="option-number">{{ item.id }}.</span>{{ item.title }}
+                                </div>
+                                <div class="option-desc">
+                                    {{ item.desc }}
+                                </div>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- SWEET OPTION -->
+            <div class="section">
+                <div class="section-title">
+                    Sweet option
+                </div>
+                <div class="section-subtitle">
+                    Choose one sweet option or select <em>No sweet option</em>.
+                </div>
+
+                <div class="options-list">
+                    {% for item in extra_options %}
+                        {% set input_id = 'extra_' ~ item.id %}
+                        <div class="option-row">
+                            <input class="option-input" type="radio"
+                                   id="{{ input_id }}"
+                                   name="extra_option"
+                                   value="{{ item.id ~ '. ' ~ item.title }}"
+                                   {% if loop.first %}checked{% endif %}>
+                            <label class="option-card" for="{{ input_id }}">
+                                <div class="option-title">
+                                    {% if item.id <= 10 %}
+                                        <span class="option-number">{{ item.id }}.</span>{{ item.title }}
+                                    {% else %}
+                                        {{ item.title }}
+                                    {% endif %}
+                                </div>
+                                <div class="option-desc">
+                                    {{ item.desc }}
+                                </div>
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- ALLERGIES & NOTES -->
+            <div class="section">
+                <div class="section-title">Allergies & notes</div>
+                <div class="field">
+                    <label for="notes">Please let us know about any allergies, intolerances or special requests.</label>
+                    <textarea id="notes" name="notes"
+                              placeholder="Example: no nuts, gluten free if possible, no onions, different options for each guest, etc."></textarea>
+                    <div class="notes-example">
+                        Once submitted, you can modify your order by contacting the reception before 21:00.
+                    </div>
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer-bar">
+                <div>
+                    Monte Pine Chalets – All rights reserved.<br>
+                    <span>Breakfast ordering experience crafted to match the look &amp; feel of your stay.</span>
+                </div>
+                <button type="submit" class="btn-confirm">Confirm order</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // URL'de ?ok=1 varsa başarı mesajı
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('ok') === '1') {
+        const banner = document.getElementById('okBanner');
+        banner.style.display = 'inline-flex';
+    }
+
+    // Tarihi bugüne çek
+    const dateInput = document.getElementById('service_date');
+    if (dateInput && !dateInput.value) {
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+</script>
+</body>
+</html>

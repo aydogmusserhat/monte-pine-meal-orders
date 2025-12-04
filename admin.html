@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Meal Orders – Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        :root {
+            --bg: #020617;
+            --card: #030712;
+            --border: #1f2937;
+            --text: #e5e7eb;
+            --muted: #9ca3af;
+            --gold: #facc6b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at top, #111827 0, #020617 40%, #000 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: var(--text);
+            padding: 24px 12px;
+        }
+        .wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #020617, #030712);
+            border-radius: 22px;
+            border: 1px solid rgba(148,163,184,0.35);
+            box-shadow: 0 24px 60px rgba(15,23,42,0.9);
+            padding: 22px 22px 24px;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+            align-items: baseline;
+        }
+        .title {
+            font-size: 1.4rem;
+            margin: 0 0 4px;
+        }
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+        .badge {
+            font-size: 0.8rem;
+            color: var(--muted);
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid #1f2937;
+            background: #020617;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.82rem;
+        }
+        thead { background: #020617; }
+        th, td {
+            padding: 8px 9px;
+            border-bottom: 1px solid #111827;
+        }
+        th {
+            text-align: left;
+            font-weight: 600;
+            color: var(--muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+        tr:nth-child(even) td { background: rgba(15,23,42,0.65); }
+
+        .pill-time {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(250, 204, 107, 0.16);
+            color: var(--gold);
+            font-size: 0.75rem;
+        }
+        .pill-meal {
+            display: inline-flex;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            margin-top: 2px;
+        }
+        .pill-breakfast {
+            background: rgba(59, 130, 246, 0.2);
+            color: #bfdbfe;
+        }
+        .pill-lunch {
+            background: rgba(34, 197, 94, 0.2);
+            color: #bbf7d0;
+        }
+        .pill-dinner {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fed7aa;
+        }
+
+        .room-badge {
+            display: inline-flex;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.4);
+            font-size: 0.75rem;
+        }
+        .notes {
+            white-space: pre-wrap;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+        .created {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        @media (max-width: 768px) {
+            .wrapper {
+                border-radius: 14px;
+                padding-inline: 14px;
+            }
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            thead { display: none; }
+            tr {
+                margin-bottom: 10px;
+                border-radius: 12px;
+                border: 1px solid #111827;
+                overflow: hidden;
+            }
+            td { border-bottom: 1px solid #020617; }
+            td:last-child { border-bottom: none; }
+            td::before {
+                display: block;
+                font-size: 0.72rem;
+                text-transform: uppercase;
+                color: var(--muted);
+                margin-bottom: 2px;
+            }
+            td[data-label]::before { content: attr(data-label); }
+        }
+        /* Üst header düzeni: logo + başlıklar */
+.header-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+/* Logo kutusu */
+.brand-logo-wrap {
+    flex-shrink: 0;
+}
+
+.brand-logo {
+    width: 150px;          /* Daha büyük / küçük istersen burayı oynat */
+    max-width: 40vw;
+}
+
+.brand-logo img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Eski center hizalamayı kaldırıyoruz */
+.page-title {
+    text-align: left;
+    margin-bottom: 0;
+}
+
+    </style>
+</head>
+<body>
+    
+
+<div class="wrapper">
+    <div class="topbar">
+        <div>
+            <h1 class="title">Meal orders</h1>
+            <div class="subtitle">Breakfast, lunch and dinner – sorted by date, time and room number.</div>
+        </div>
+        <div class="badge">
+            Total orders: {{ orders|length }}
+        </div>
+    </div>
+
+    {% if orders %}
+        <table>
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>Date &amp; meal</th>
+                <th>Time</th>
+                <th>Room / guests</th>
+                <th>Guest</th>
+                <th>Main option</th>
+                <th>Extra option</th>
+                <th>Allergies / notes</th>
+                <th>Created</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for o in orders %}
+                {% set id           = o[0] %}
+                {% set meal_type    = o[1] %}
+                {% set room         = o[2] %}
+                {% set guest_name   = o[3] %}
+                {% set guests_count = o[4] %}
+                {% set s_date       = o[5] %}
+                {% set time         = o[6] %}
+                {% set main_opt     = o[7] %}
+                {% set extra_opt    = o[8] %}
+                {% set notes        = o[9] %}
+                {% set created_at   = o[10] %}
+                <tr>
+                    <td data-label="#">
+                        {{ id }}
+                    </td>
+                    <td data-label="Date & meal">
+                        <div>{{ s_date }}</div>
+                        <div class="pill-meal
+                            {% if meal_type == 'breakfast' %}pill-breakfast
+                            {% elif meal_type == 'lunch' %}pill-lunch
+                            {% else %}pill-dinner{% endif %}">
+                            {% if meal_type == 'breakfast' %}Breakfast
+                            {% elif meal_type == 'lunch' %}Lunch
+                            {% else %}Dinner{% endif %}
+                        </div>
+                    </td>
+                    <td data-label="Time">
+                        <span class="pill-time">{{ time }}</span>
+                    </td>
+                    <td data-label="Room / guests">
+                        <div class="room-badge">Room {{ room }}</div>
+                        <div class="created">{{ guests_count }} guest(s)</div>
+                    </td>
+                    <td data-label="Guest">
+                        {{ guest_name or "—" }}
+                    </td>
+                    <td data-label="Main option">
+                        {{ main_opt }}
+                    </td>
+                    <td data-label="Extra option">
+                        {{ extra_opt or "—" }}
+                    </td>
+                    <td data-label="Notes" class="notes">
+                        {{ notes or "—" }}
+                    </td>
+                    <td data-label="Created">
+                        <div class="created">{{ created_at }}</div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="subtitle">
+            No orders yet.
+        </div>
+    {% endif %}
+</div>
+</body>
+</html>
